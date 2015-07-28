@@ -76,16 +76,39 @@ def patternToNumber(pattern):
 
     return sum
 
+"""
+index is the number to convert
+k is the length of the pattern to get from the index (k-mer)
+"""
 def numberToPattern(index, k):
-    number = index
-    resultAsList= []
-    while number > 0:
-        bp = number % 4
-        number = number / 4
-        resultAsList.append(bp)
 
-    resultAsList.reverse()
-    print (resultAsList)
+    count = 0 # count the number of nucleotides in the pattern
+    pattern = []
+    val = index
+
+    while count != k:
+        if val == 0:
+            pattern.append(0)
+        else:
+            pattern.append(val%4)
+            val = int(val/4)
+        count = count + 1
+
+
+    pattern.reverse()
+
+    for i in range(k):
+        i_nucleotide = pattern[i]
+        if i_nucleotide == 0:
+            pattern[i] = 'A'
+        elif i_nucleotide == 1:
+            pattern[i] = 'C'
+        elif i_nucleotide == 2:
+            pattern[i] = 'G'
+        else :
+            pattern[i] = 'T'
+
+    return pattern
 
 
 """
@@ -93,19 +116,45 @@ Return: All most frequent k-mers in Text (in any order) using faster frequent wo
 """
 def fasterMostFrequentsKMers(text, k):
 
+    textLen = len(text)
+    frequencyArray = np.zeros(4**k)
+    mostFrequentPatterns = []
+
+    for i in range(0, textLen - k):
+        frequencyArray[patternToNumber(text[i:i+k])]+=1
+
+
+    maxValue = frequencyArray.max()
+    sortedIndexes = frequencyArray.argsort()
+    index = sortedIndexes[-1]
+    it = -1
+    while frequencyArray[index] == maxValue:
+        mostFrequentPatterns.append("".join(numberToPattern(index, k)))
+        it -= 1
+        index = sortedIndexes[it]
+
+    return mostFrequentPatterns
 
 
 
 def main():
 
-    text = "AATGGTCCTCGTGCCATGCCAGCGATAGTTGGGATTCGATAGTTATGCCAGCTCGTGCCGGGATTCTCGTGCCAATGGTCCTCGTGCCAATGGTCCGGGATTCAATGGTCCATGCCAGCGGGATTCATGCCAGCGATAGTTTCGTGCCGGGATTCGATAGTTATGCCAGCTCGTGCCGGGATTCATGCCAGCTCGTGCCGGGATTCTCGTGCCTCGTGCCGGGATTCAATGGTCCATGCCAGCTCGTGCCATGCCAGCTCGTGCCGGGATTCAATGGTCCGGGATTCGATAGTTATGCCAGCGGGATTCTCGTGCCGGGATTCAATGGTCCTCGTGCCTCGTGCCGATAGTTGGGATTCGGGATTCTCGTGCCATGCCAGCTCGTGCCTCGTGCCGATAGTTGATAGTTAATGGTCCAATGGTCCAATGGTCCTCGTGCCAATGGTCCATGCCAGCATGCCAGCGGGATTCATGCCAGCTCGTGCCATGCCAGCATGCCAGCAATGGTCCATGCCAGCAATGGTCCATGCCAGCAATGGTCCATGCCAGCGGGATTCGGGATTCGATAGTTGATAGTTGATAGTTATGCCAGCAATGGTCCTCGTGCCATGCCAGCGATAGTTGGGATTCTCGTGCCAATGGTCCATGCCAGCTCGTGCCAATGGTCCGGGATTCTCGTGCCATGCCAGCAATGGTCCAATGGTCCGGGATTCTCGTGCCTCGTGCCTCGTGCCGGGATTCATGCCAGCTCGTGCCATGCCAGCTCGTGCCTCGTGCCAATGGTCCGGGATTCTCGTGCCTCGTGCCATGCCAGCTCGTGCCAATGGTCC"
-    k = 12
+
+    INPATH = '/Users/yafeunteun/Desktop/Vibrio_cholerae.txt'
+    k = 9
+    try:
+        with open(INPATH) as data:
+            text = data.readline().strip()
+            for pattern in fasterMostFrequentsKMers(text, k):
+                print(pattern)
+    except IOError as err:
+        print("An error occured : " + err.strerror)
+
+    text = "ACATCATGAGGCACCGAAACTGAAGCCTCTCCAGGTACTGAGGGTGTTACCGCAGACGCTGCTTTAGTACTTGAAGCGGCGGCTAAGGGAGGAATGCAAAGATTCTAGTCGGCTCCTGGCAGTGAAGGTACATAGCCGATAACGCCAGTTCGGGCGGAAAAACGAAACTCTCGACAGGTCAGGGGTGAGACGCACCTAGTAAATGGTATGTATTGTTACTTATGCCTCCTGTGATAACGAGTGCCGGCAGCCTATGGTATTGCCCACAGTACCCAAATCTCCCCTCAACCTCTTCGGGACTCGTCTGTTCGCGTAATAATGTGATTTGATTCAGCGCATCCTTCTCTACGAGGTTTAGCAGTAAACGGGGCAAAGTTCGCGGGGGATCCGCGAACACCGAAGCCAGTCTTAATCTATACCTACGGCGAGCCCGAGGTTTCAGGCCAATTGGCTAGCACCGTTTTCCGATATGCACCACCGATCCTATCTAGCAAGAGCTTAGCCCGAGGTGCAGTCCTATTCAGAAGGCGGCGGCCTTATGTTGCGATTTAAAAGCCTAGTTCGTGCGGAGCCTCCTGGACTCAAGTGTCAAGCGCGGGTGGCCTTCTAGCTGGCAGATACGGATGCCGAGAGCAATGCATTCTCTTGGTGTCACAAGTACCTACTTGAGAGCCCCTGGGATGGGGCTTCAGGATTATCGCAATGAGCGTGTGGCACATTGGTGTCACG"
 
 
-    for pattern in mostFrequentsKMers(text, k):
-        print(pattern)
-
-
+    #for pattern in fasterMostFrequentsKMers(text, k):
+     #   print(pattern)
 
 if __name__ == '__main__':
     main()
