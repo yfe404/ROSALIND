@@ -114,24 +114,23 @@ def numberToPattern(index, k):
 """
 Return: All most frequent k-mers in Text (in any order) using faster frequent words algorithm
 """
-def fasterMostFrequentsKMers(text, k):
+def fasterMostFrequentsKMers(text, k, frequency=-1):
 
     textLen = len(text)
-    frequencyArray = np.zeros(4**k)
+    frequencyArray = dict()
     mostFrequentPatterns = []
 
     for i in range(0, textLen - k):
-        frequencyArray[patternToNumber(text[i:i+k])]+=1
+        try:
+            frequencyArray[text[i:i+k]]+=1
+        except KeyError as err:
+            frequencyArray[text[i:i+k]] = 1
 
+    frequency = max(frequencyArray.values()) if frequency < 0 else frequency
 
-    maxValue = frequencyArray.max()
-    sortedIndexes = frequencyArray.argsort()
-    index = sortedIndexes[-1]
-    it = -1
-    while frequencyArray[index] == maxValue:
-        mostFrequentPatterns.append("".join(numberToPattern(index, k)))
-        it -= 1
-        index = sortedIndexes[it]
+    for key in frequencyArray.keys():
+        if frequencyArray[key] >= frequency:
+            mostFrequentPatterns.append(key)
 
     return mostFrequentPatterns
 
@@ -140,21 +139,20 @@ def fasterMostFrequentsKMers(text, k):
 def main():
 
 
-    INPATH = '/Users/yafeunteun/Desktop/Vibrio_cholerae.txt'
-    k = 9
+
+    INPATH = './datasets/1bba/rosalind_1bba.txt'
+    OUTPATH = './datasets/1bba/result_1bba.txt'
+
+
     try:
-        with open(INPATH) as data:
+        with open(INPATH) as data, open(OUTPATH, 'w') as result:
             text = data.readline().strip()
+            k = int(data.readline().strip())
             for pattern in fasterMostFrequentsKMers(text, k):
-                print(pattern)
+                result.write(pattern)
+                result.write("\n")
     except IOError as err:
         print("An error occured : " + err.strerror)
-
-    text = "ACATCATGAGGCACCGAAACTGAAGCCTCTCCAGGTACTGAGGGTGTTACCGCAGACGCTGCTTTAGTACTTGAAGCGGCGGCTAAGGGAGGAATGCAAAGATTCTAGTCGGCTCCTGGCAGTGAAGGTACATAGCCGATAACGCCAGTTCGGGCGGAAAAACGAAACTCTCGACAGGTCAGGGGTGAGACGCACCTAGTAAATGGTATGTATTGTTACTTATGCCTCCTGTGATAACGAGTGCCGGCAGCCTATGGTATTGCCCACAGTACCCAAATCTCCCCTCAACCTCTTCGGGACTCGTCTGTTCGCGTAATAATGTGATTTGATTCAGCGCATCCTTCTCTACGAGGTTTAGCAGTAAACGGGGCAAAGTTCGCGGGGGATCCGCGAACACCGAAGCCAGTCTTAATCTATACCTACGGCGAGCCCGAGGTTTCAGGCCAATTGGCTAGCACCGTTTTCCGATATGCACCACCGATCCTATCTAGCAAGAGCTTAGCCCGAGGTGCAGTCCTATTCAGAAGGCGGCGGCCTTATGTTGCGATTTAAAAGCCTAGTTCGTGCGGAGCCTCCTGGACTCAAGTGTCAAGCGCGGGTGGCCTTCTAGCTGGCAGATACGGATGCCGAGAGCAATGCATTCTCTTGGTGTCACAAGTACCTACTTGAGAGCCCCTGGGATGGGGCTTCAGGATTATCGCAATGAGCGTGTGGCACATTGGTGTCACG"
-
-
-    #for pattern in fasterMostFrequentsKMers(text, k):
-     #   print(pattern)
 
 if __name__ == '__main__':
     main()
