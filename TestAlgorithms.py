@@ -3,6 +3,7 @@ __author__ = 'yafeunteun'
 
 import unittest
 from frequentWordProblem import fasterMostFrequentsKMers
+from reverseComplementProblem import reverseComplement
 
 class TestAlgorithms(unittest.TestCase):
 
@@ -11,13 +12,18 @@ class TestAlgorithms(unittest.TestCase):
         k = 4
         result = ["CATG", "GCAT"]
 
-        self.assertListEqual(result, fasterMostFrequentsKMers(text, 4))
+        self.assertListEqual(sorted(result), sorted(fasterMostFrequentsKMers(text, 4)))
+
+    def test_reverseComplementProblem(self):
+        text = "AAAACCCGGT"
+        self.assertEqual("ACCGGGTTTT", "".join(reverseComplement(text)))
 
 
-
-
+def main():
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestAlgorithms)
+    unittest.TextTestRunner(verbosity=2).run(suite)
 
 if __name__ == '__main__':
-    unittest.main()
+    main()
 
 
