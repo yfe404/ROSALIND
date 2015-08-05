@@ -4,6 +4,7 @@ __author__ = 'yafeunteun'
 import unittest
 from frequentWordProblem import fasterMostFrequentsKMers
 from reverseComplementProblem import reverseComplement
+from patternMatchingProblem import patternMatching
 
 class TestAlgorithms(unittest.TestCase):
 
@@ -17,6 +18,12 @@ class TestAlgorithms(unittest.TestCase):
     def test_reverseComplementProblem(self):
         text = "AAAACCCGGT"
         self.assertEqual("ACCGGGTTTT", "".join(reverseComplement(text)))
+
+    def test_patternMatchingProblem(self):
+        pattern = "ATAT"
+        text = "GATATATGCATATACTT"
+
+        self.assertListEqual(sorted(["1", "3", "9"]), sorted(patternMatching(pattern, text) ))
 
 
 def main():
